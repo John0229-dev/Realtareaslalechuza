@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tareas La Lechuza</title>
+  <link rel="icon" href="icono.png" type="image/x-icon" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    /* Encabezado */
+    .header-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, #ff4444, #cc3333);
+      overflow: hidden;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .header-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 400px;
+      background: url('lechuza.png') center center no-repeat;
+      background-size: contain;
+      opacity: 0.3;
+      z-index: 1;
+      transition: transform 0.1s ease-out;
+    }
+
+    .header-container::after {
+      content: '';
+      position: absolute;
+      bottom: -50px;
+      left: 0;
+      width: 100%;
+      height: 100px;
+      background:#f5f5f5;;
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      z-index: 3;
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 4;
+      text-align: center;
+      padding-top: 30px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo {
+      color: white;
+      font-size: 2.8rem;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      transition: all 0.3s ease;
+    }
+
+    .header-container.scrolled {
+      height: 120px;
+    }
+
+    .header-container.scrolled .logo {
+      font-size: 2rem;
+    }
+
+    .header-container.scrolled .header-image {
+      transform: translateY(-100px);
+      opacity: 0.1;
+    }
+
+    /* Botón de la lechuza */
+    .lechuza-button {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      width: 120px;
+      height: 120px;
+      z-index: 5;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lechuza-button:hover {
+      transform: scale(1.1);
+      filter: brightness(1.2);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .lechuza-button:active {
+      transform: scale(0.95);
+    }
+
+    .lechuza-button img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    /* Indicador de audio */
+    .audio-indicator {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      width: 25px;
+      height: 25px;
+      background: #ff4444;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border: 2px solid white;
+    }
+
+    .lechuza-button.playing .audio-indicator {
+      opacity: 1;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    /* Status de debug */
+    .audio-debug {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      z-index: 2000;
+      display: none;
+    }
+
+    /* ===== ESTILOS PARA ANUNCIOS ===== */
+    .ad-banner {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+      margin: 20px auto;
+      position: relative;
+    }
+
+    .ad-banner::before {
+      content: 'Publicidad';
+      position: absolute;
+      top: 5px;
+      left: 10px;
+      font-size: 10px;
+      color: #999;
+      z-index: 1;
+    }
+
+    /* Anuncio superior - Banner horizontal */
+    .ad-top {
+      max-width: 728px;
+      height: 90px;
+      margin: 20px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+    }
+
+    /* Anuncio lateral derecho */
+    .ad-sidebar {
+      position: fixed;
+      top: 250px;
+      right: 20px;
+      width: 160px;
+      height: 600px;
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      z-index: 100;
+      display: none; /* Oculto por defecto en móvil */
+    }
+
+    /* Anuncio en el contenido */
+    .ad-content {
+      max-width: 336px;
+      height: 280px;
+      margin: 30px auto;
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Anuncio inferior */
+    .ad-bottom {
+      max-width: 728px;
+      height: 90px;
+      margin: 30px auto;
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Placeholder para anuncios */
+    .ad-placeholder {
+      color: #666;
+      font-size: 14px;
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* Responsive para anuncios */
+    @media (min-width: 1400px) {
+      .ad-sidebar {
+        display: block;
+      }
+      
+      .main-content {
+        margin-right: 200px; /* Espacio para el anuncio lateral */
+      }
+    }
+
+    @media (max-width: 768px) {
+      .ad-top,
+      .ad-bottom {
+        max-width: 320px;
+        height: 50px;
+      }
+      
+      .ad-content {
+        max-width: 300px;
+        height: 250px;
+      }
+    }
+
+    /* Menú hamburguesa */
+    .navigation {
+      position: fixed;
+      top: 40px;
+      right: 40px;
+      z-index: 1100;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 45px;
+      height: 45px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      cursor: pointer;
+      z-index: 1200;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 25px;
+      height: 3px;
+      background: #ff4444;
+      margin: 4px 0;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      right: -260px;
+      width: 220px;
+      height: 100vh;
+      background: #fff;
+      box-shadow: -2px 0 20px rgba(0,0,0,0.08);
+      border-radius: 20px 0 0 20px;
+      padding: 80px 30px 30px 30px;
+      gap: 25px;
+      transition: right 0.3s cubic-bezier(.77,0,.18,1);
+    }
+
+    .nav-menu.open {
+      right: 0;
+    }
+
+    .nav-item {
+      text-decoration: none;
+      color: #333;
+      font-weight: 600;
+      font-size: 1.1rem;
+      padding: 12px 0;
+      border-radius: 10px;
+      transition: all 0.3s;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: #ff4444;
+      color: #fff;
+    }
+
+    /* ----------- ✅ Menú para PC (horizontal) ----------- */
+    @media (min-width: 769px) {
+      .nav-menu {
+        position: static;
+        top: auto;
+        left: auto;
+        transform: none;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        background: transparent;
+        box-shadow: none;
+        padding: 0;
+        gap: 40px;
+        width: auto;
+        height: auto;
+        border-radius: 0;
+        z-index: 1101;
+      }
+
+      .navigation {
+        position: static;
+        top: auto;
+        right: auto;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        background: transparent;
+        box-shadow: none;
+        z-index: 1101;
+      }
+
+      .nav-item {
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding: 10px 18px;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background 0.3s, color 0.3s;
+      }
+
+      .nav-item:hover,
+      .nav-item.active {
+        background: #fff;
+        color: #ff4444;
+      }
+
+      .hamburger {
+        display: none !important;
+      }
+    }
+
+    /* Responsive mobile */
+    @media (max-width: 1024px) {
+      .navigation {
+        top: 30px;
+        right: 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navigation {
+        top: 20px;
+        right: 10px;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+
+      .nav-menu {
+        padding-top: 70px;
+      }
+
+      .header-container {
+        height: 300px;
+      }
+
+      .logo {
+        font-size: 2.5rem;
+      }
+
+      .welcome-title {
+        font-size: 2rem;
+      }
+
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Contenido principal */
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 280px 20px 0 20px;
+      text-align: center;
+      transition: margin-right 0.3s ease;
+    }
+
+    .welcome-section {
+      background: white;
+      border-radius: 15px;
+      padding: 40px 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      margin-bottom: 40px;
+    }
+
+    .welcome-title {
+      font-size: 2.5rem;
+      color: #333;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .welcome-text {
+      font-size: 1.2rem;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .service-card {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .service-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .service-icon {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+
+    .service-title {
+      font-size: 1.5rem;
+      color: #333;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .service-description {
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .footer {
+      background: #333;
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+      margin-top: 80px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Debug de audio -->
+  <div class="audio-debug" id="audioDebug">
+    Audio Status: <span id="audioStatus">Listo</span>
+  </div>
+  
+  <!-- Encabezado -->
+  <div class="header-container" id="header">
+    <div class="header-image"></div>
+    
+    <!-- Botón de la lechuza con audio -->
+    <button class="lechuza-button" id="lechuzaButton" aria-label="Reproducir sonido de lechuza">
+      <img src="lechuza.png" alt="Lechuza" />
+      <div class="audio-indicator" id="audioIndicator">🔊</div>
+    </button>
+    
+    <!-- Elementos de audio (ocultos) -->
+    <audio id="audio1" preload="metadata">
+      <source src="corte uno.wav" type="audio/wav">
+      <source src="corte_uno.mp3" type="audio/mpeg">
+      Tu navegador no soporta el elemento de audio.
+    </audio>
+    <audio id="audio2" preload="metadata">
+      <source src="corte dos.wav" type="audio/wav">
+      <source src="corte_dos.mp3" type="audio/mpeg">
+      Tu navegador no soporta el elemento de audio.
+    </audio>
+    <audio id="audio3" preload="metadata">
+      <source src="corte tres.wav" type="audio/wav">
+      <source src="corte_tres.mp3" type="audio/mpeg">
+      Tu navegador no soporta el elemento de audio.
+    </audio>
+    
+    <div class="header-content">
+      <h1 class="logo">Tareas La Lechuza</h1>
+    </div>
+  </div>
+
+  <div class="navigation" id="navigation">
+    <div class="hamburger" id="hamburger" aria-label="Abrir menú de navegación" tabindex="0">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav class="nav-menu" id="navMenu">
+      <a href="index.html" class="nav-item active">Inicio</a>
+      <a href="noticias.html" class="nav-item">Noticias</a>
+      <a href="testimonios.html" class="nav-item">Testimonios</a>
+      <a href="contactos.html" class="nav-item">Contacto</a>
+    </nav>
+  </div>
+
+  <!-- Contenido principal -->
+  <main class="main-content">
+    
+    <!-- Anuncio superior -->
+    <div class="ad-banner ad-top">
+      <div class="ad-placeholder">
+        <!-- Aquí va tu código de Google AdSense para banner superior -->
+        <p>Anuncio Banner Superior 728x90</p>
+      </div>
+    </div>
+
+    <section class="welcome-section" id="inicio">
+      <h2 class="welcome-title">Bienvenido a Tareas La Lechuza</h2>
+      <p class="welcome-text">
+        Tareas la lechuza es tu socio confiable libre de estafas y problemas.
+        aqui podeis encontrar informacion de mis servicios, noticias, testimonios y enviarme mensajes facilmente.
+        <br>
+        <strong>tu socio confiable para todas tus necesidades de servicios academicos.</strong>  
+      </p>
+    </section>
+<!-- Anuncio inferior -->
+    <div class="ad-banner ad-bottom">
+      <div class="ad-placeholder">
+        <!-- Aquí va tu código de Google AdSense para banner inferior -->
+        <p>Anuncio Banner Inferior 728x90</p>
+      </div>
+    </div>
+    
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">📰</div>
+        <h3 class="service-title">Noticias</h3>
+        <p class="service-description">Puedes estar atento a cada noticia que publique desde avisos y promociones. hay meses que coloco promociones o eventos o cuando tengo ascenso en la masoneria </p>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon">⭐</div>
+        <h3 class="service-title">Testimonios</h3>
+        <p class="service-description">Lee las experiencias y opiniones de mis clientes satisfechos. ¿te gustaria que tu reseña aparezca aqui? <strong>¡Déjamelo saber!</strong></p>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon">📧</div>
+        <h3 class="service-title">Contacto</h3>
+        <p class="service-description">Ponte en contacto conmigo para cualquier consulta o solicitud de servicios. ¡que esperas! es gratis la mensajeria</p>
+      </div>
+    </div>
+
+    <!-- Anuncio en el contenido -->
+    <div class="ad-banner ad-content">
+      <div class="ad-placeholder">
+        <!-- Aquí va tu código de Google AdSense para anuncio rectangular -->
+        <p>Anuncio Rectangular<br>336x280</p>
+      </div>
+    </div>
+
+    
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 Tareas La Lechuza. Todos los derechos reservados.</p>
+  </footer>
+
+  <script>
+    // ===== SISTEMA DE AUDIO CORREGIDO =====
+    let currentAudioIndex = 0;
+    let isPlaying = false;
+    let audios = [];
+    
+    const lechuzaButton = document.getElementById('lechuzaButton');
+    const audioIndicator = document.getElementById('audioIndicator');
+    const audioDebug = document.getElementById('audioDebug');
+    const audioStatus = document.getElementById('audioStatus');
+
+    // Función para mostrar debug
+    function showDebug(message) {
+      audioStatus.textContent = message;
+      audioDebug.style.display = 'block';
+      setTimeout(() => {
+        audioDebug.style.display = 'none';
+      }, 2000);
+    }
+
+    // Función para mostrar indicador de reproducción
+    function startAudioIndicator() {
+      lechuzaButton.classList.add('playing');
+      isPlaying = true;
+    }
+
+    // Función para ocultar indicador de reproducción
+    function stopAudioIndicator() {
+      lechuzaButton.classList.remove('playing');
+      isPlaying = false;
+    }
+
+    // Función principal para reproducir audio
+    function playAudio() {
+      // Detener todos los audios primero
+      audios.forEach(audio => {
+        if (audio) {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+      });
+
+      // Obtener el audio actual
+      let playIndex = currentAudioIndex;
+      const currentAudio = audios[playIndex];
+
+      if (!currentAudio) {
+        console.error('Audio no encontrado en índice:', playIndex);
+        showDebug('Audio no encontrado');
+        return;
+      }
+
+      console.log(`Reproduciendo audio ${playIndex + 1}`);
+      showDebug(`Reproduciendo audio ${playIndex + 1}`);
+
+      // Reproducir el audio inmediatamente
+      startAudioIndicator();
+
+      currentAudio.play()
+        .then(() => {
+          console.log(`Audio ${playIndex + 1} iniciado correctamente`);
+        })
+        .catch(error => {
+          console.error('Error al reproducir audio:', error);
+          showDebug('Error al reproducir');
+          stopAudioIndicator();
+        });
+
+      // Avanzar al siguiente audio para la próxima vez
+      currentAudioIndex = (currentAudioIndex + 1) % audios.length;
+    }
+
+    // Inicializar sistema de audio
+    function initializeAudio() {
+      audios = [
+        document.getElementById('audio1'),
+        document.getElementById('audio2'),
+        document.getElementById('audio3')
+      ];
+
+      audios.forEach((audio, index) => {
+        if (audio) {
+          audio.volume = 0.7;
+          
+          // Evento cuando el audio termina
+          audio.addEventListener('ended', () => {
+            console.log(`Audio ${index + 1} terminó`);
+            stopAudioIndicator();
+          });
+          
+          // Evento de error
+          audio.addEventListener('error', (e) => {
+            console.error(`Error en audio ${index + 1}:`, e);
+            showDebug(`Error audio ${index + 1}`);
+            stopAudioIndicator();
+          });
+          
+          console.log(`Audio ${index + 1} inicializado`);
+        } else {
+          console.error(`Audio ${index + 1} no encontrado`);
+        }
+      });
+    }
+
+    // Evento principal del botón
+    lechuzaButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      playAudio();
+    });
+
+    // Soporte para teclado
+    lechuzaButton.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        playAudio();
+      }
+    });
+
+    // Inicializar cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM cargado, inicializando sistema de audio...');
+      initializeAudio();
+      showDebug('Sistema de audio listo');
+    });
+
+    // ===== RESTO DEL CÓDIGO (sin cambios) =====
+    
+    // Header scroll effect
+    window.addEventListener('scroll', function () {
+      const header = document.getElementById('header');
+      const scrollPosition = window.scrollY;
+      if (scrollPosition > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+      const headerImage = document.querySelector('.header-image');
+      const moveY = scrollPosition * 0.5;
+      headerImage.style.transform = `translateY(-${moveY}px)`;
+    });
+
+    // Menú hamburguesa
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('navMenu');
+
+    function toggleMenu() {
+      navMenu.classList.toggle('open');
+    }
+
+    hamburger.addEventListener('click', toggleMenu);
+    hamburger.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') toggleMenu();
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!navMenu.contains(e.target) && !hamburger.contains(e.target)) {
+        navMenu.classList.remove('open');
+      }
+    });
+
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function () {
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        this.classList.add('active');
+        navMenu.classList.remove('open');
+      });
+    });
+
+    // Scroll suave
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,819 @@
+<?php
+  $current = basename($_SERVER['PHP_SELF']);
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tareas La Lechuza</title>
+  <link rel="icon" href="icono.png" type="image/x-icon" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    /* Encabezado */
+    .header-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, #ff4444, #cc3333);
+      overflow: hidden;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .header-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 400px;
+      background: url('callcenter.png') center center no-repeat;
+      background-size: contain;
+      opacity: 0.3;
+      z-index: 1;
+      transition: transform 0.1s ease-out;
+    }
+
+    .header-container::after {
+      content: '';
+      position: absolute;
+      bottom: -50px;
+      left: 0;
+      width: 100%;
+      height: 100px;
+      background:#f5f5f5;;
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      z-index: 3;
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 4;
+      text-align: center;
+      padding-top: 30px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo {
+      color: white;
+      font-size: 2.8rem;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      transition: all 0.3s ease;
+    }
+
+    .header-container.scrolled {
+      height: 120px;
+    }
+
+    .header-container.scrolled .logo {
+      font-size: 2rem;
+    }
+
+    .header-container.scrolled .header-image {
+      transform: translateY(-100px);
+      opacity: 0.1;
+    }
+
+    /* Menú hamburguesa */
+    .navigation {
+      position: fixed;
+      top: 40px;
+      right: 40px;
+      z-index: 1100;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 45px;
+      height: 45px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      cursor: pointer;
+      z-index: 1200;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 25px;
+      height: 3px;
+      background: #ff4444;
+      margin: 4px 0;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      right: -260px;
+      width: 220px;
+      height: 100vh;
+      background: #fff;
+      box-shadow: -2px 0 20px rgba(0,0,0,0.08);
+      border-radius: 20px 0 0 20px;
+      padding: 80px 30px 30px 30px;
+      gap: 25px;
+      transition: right 0.3s cubic-bezier(.77,0,.18,1);
+    }
+
+    .nav-menu.open {
+      right: 0;
+    }
+
+    .nav-item {
+      text-decoration: none;
+      color: #333;
+      font-weight: 600;
+      font-size: 1.1rem;
+      padding: 12px 0;
+      border-radius: 10px;
+      transition: all 0.3s;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: #ff4444;
+      color: #fff;
+    }
+
+    /* ----------- ✅ Menú para PC (horizontal) ----------- */
+    @media (min-width: 769px) {
+      .nav-menu {
+        position: static;
+        top: auto;
+        left: auto;
+        transform: none;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        background: transparent;
+        box-shadow: none;
+        padding: 0;
+        gap: 40px;
+        width: auto;
+        height: auto;
+        border-radius: 0;
+        z-index: 1101;
+      }
+
+      .navigation {
+        position: static;
+        top: auto;
+        right: auto;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        background: transparent;
+        box-shadow: none;
+        z-index: 1101;
+      }
+
+      .nav-item {
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding: 10px 18px;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background 0.3s, color 0.3s;
+      }
+
+      .nav-item:hover,
+      .nav-item.active {
+        background: #fff;
+        color: #ff4444;
+      }
+
+      .hamburger {
+        display: none !important;
+      }
+    }
+
+    /* Responsive mobile */
+    @media (max-width: 1024px) {
+      .navigation {
+        top: 30px;
+        right: 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navigation {
+        top: 20px;
+        right: 10px;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+
+      .nav-menu {
+        padding-top: 70px;
+      }
+
+      .header-container {
+        height: 300px;
+      }
+
+      .logo {
+        font-size: 2.5rem;
+      }
+
+      .welcome-title {
+        font-size: 2rem;
+      }
+
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Contenido principal */
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 280px 20px 0 20px;
+      text-align: center;
+    }
+
+    .welcome-section {
+      background: white;
+      border-radius: 15px;
+      padding: 40px 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      margin-bottom: 40px;
+    }
+
+    .welcome-title {
+      font-size: 2.5rem;
+      color: #333;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .welcome-text {
+      font-size: 1.2rem;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .service-card {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .service-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .service-icon {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+
+    .service-title {
+      font-size: 1.5rem;
+      color: #333;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .service-description {
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .field {
+  margin-bottom: 10px;
+}
+
+form#form {
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.field {
+  margin-bottom: 20px;
+}
+
+.field label {
+  display: block;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.field input[type="text"],
+.field input[type="email"],
+.field textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fafafa;
+  transition: border 0.3s;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: #ff4444;
+  outline: none;
+  background-color: #fff;
+}
+
+input[type="submit"] {
+  background-color: #ff4444;
+  color: white;
+  padding: 12px 25px;
+  font-size: 15px;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-top: 10px;
+}
+
+input[type="submit"]:hover {
+  background-color: #cc3333;
+}
+
+#status-message {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 16px;
+}
+
+
+    .footer {
+      background: #333;
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+      margin-top: 80px;
+    }
+    /* Botón de la lechuza */
+    .lechuza-button {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      width: 120px;
+      height: 120px;
+      z-index: 5;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lechuza-button:hover {
+      transform: scale(1.1);
+      filter: brightness(1.2);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .lechuza-button:active {
+      transform: scale(0.95);
+    }
+
+    .lechuza-button img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    /* Indicador de audio */
+    .audio-indicator {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      width: 25px;
+      height: 25px;
+      background: #ff4444;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border: 2px solid white;
+    }
+
+    .lechuza-button.playing .audio-indicator {
+      opacity: 1;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    /* Status de debug */
+    .audio-debug {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      z-index: 2000;
+      display: none;
+    }
+    /* CSS para los anuncios tipo ad-banner */
+.ad-banner {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 30px 0 0 0;
+  padding: 0;
+  background: transparent;
+  min-height: 90px;
+  z-index: 100;
+}
+
+.ad-banner.ad-bottom {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+  border-top: 2px solid #eee;
+  padding: 10px 0;
+}
+
+.ad-placeholder {
+  width: 728px;
+  max-width: 98vw;
+  min-height: 90px;
+  background: #f5f5f5;
+  border: 2px dashed #ff4444;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cc3333;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(255,68,68,0.07);
+}
+
+@media (max-width: 800px) {
+  .ad-placeholder {
+    width: 100%;
+    min-width: 0;
+    font-size: 1rem;
+    padding: 10px 0;
+  }
+  .ad-banner.ad-bottom {
+    padding: 0;
+  }
+}
+.field {
+  margin-bottom: 10px;
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  color: #777;
+}
+
+.field input {
+  display: block;
+  min-width: 250px;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+input[type="submit"] {
+  display: block;
+  padding: 6px 30px;
+  font-size: 14px;
+  background-color: #ff0808;
+  color: #fff;
+  border: none
+}
+  </style>
+</head>
+<body>
+  <!-- Encabezado -->
+  <div class="header-container" id="header">
+    <div class="header-image"></div>
+    <button class="lechuza-button" id="lechuzaButton" aria-label="Reproducir sonido de lechuza">
+      <img src="lechuza.png" alt="Lechuza" />
+      <div class="audio-indicator" id="audioIndicator">🔊</div>
+    </button>
+
+<!-- Elementos de audio (ocultos) -->
+    <audio id="audio1" preload="metadata">
+      <source src="corte uno.wav" type="audio/wav">
+      <source src="corte_uno.mp3" type="audio/mpeg">
+      Tu navegador no soporta el elemento de audio.
+    </audio>
+    <audio id="audio2" preload="metadata">
+      <source src="corte dos.wav" type="audio/wav">
+      <source src="corte_dos.mp3" type="audio/mpeg">
+      Tu navegador no soporta el elemento de audio.
+    </audio>
+    <audio id="audio3" preload="metadata">
+      <source src="corte tres.wav" type="audio/wav">
+      <source src="corte_tres.mp3" type="audio/mpeg">
+      Tu navegador no soporta el elemento de audio.
+    </audio>
+
+    <div class="header-content">
+      <h1 class="logo">Tareas La Lechuza</h1>
+    </div>
+  </div>
+
+  <!-- Navegación -->
+ <div class="navigation" id="navigation">
+  <div class="hamburger" id="hamburger" aria-label="Abrir menú de navegación" tabindex="0">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <nav class="nav-menu" id="navMenu">
+    <a href="index.html" class="nav-item">Inicio</a>
+    <a href="noticias.html" class="nav-item">Noticias</a>
+    <a href="testimonios.html" class="nav-item">Testimonios</a>
+    <a href="contactos.html" class="nav-item">Contacto</a>
+  </nav>
+</div>
+
+
+  <!-- Contenido principal -->
+  <main class="main-content">
+
+      <!-- Anuncio inferior -->
+    <div class="ad-banner ad-bottom">
+      <div class="ad-placeholder">
+        <!-- Aquí va tu código de Google AdSense para banner inferior -->
+        <p>Anuncio Banner Inferior 728x90</p>
+      </div>
+    </div>
+
+    <section class="welcome-section" id="inicio">
+  <h2 class="welcome-title">Contáctame</h2>
+  <p class="welcome-text">Callcenter "lechuzilla" te invita a que te pongas en contacto con ¡el mero mero!  
+  <form id="form">
+  <div class="field">
+    <label for="name">nombre</label>
+    <input type="text" name="name" id="name">
+  </div>
+  <div class="field">
+    <label for="title">Materia y actividad a realizar:</label>
+    <input type="text" name="title" id="title">
+  </div>
+  <div class="field">
+    <label for="email">Email</label>
+    <input type="text" name="email" id="email">
+  </div>
+
+  <input type="submit" id="button" value="Send Email" >Enviar Email (español)
+</form>
+
+<script type="text/javascript"
+  src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<script type="text/javascript">
+  emailjs.init('YP9YqkkEIWYurnEl9')
+</script>
+
+  <p id="status-message" style="margin-top: 20px; font-weight: bold;"></p>
+</section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 Tareas La Lechuza. Todos los derechos reservados.</p>
+  </footer>
+
+  <script>
+   // ===== SISTEMA DE AUDIO CORREGIDO =====
+
+    // ===== SISTEMA DE AUDIO CORREGIDO =====
+    let currentAudioIndex = 0;
+    let isPlaying = false;
+    let audios = [];
+
+    const lechuzaButton = document.getElementById('lechuzaButton');
+    const audioIndicator = document.getElementById('audioIndicator');
+
+    // Función para mostrar indicador de reproducción
+    function startAudioIndicator() {
+      lechuzaButton.classList.add('playing');
+      isPlaying = true;
+    }
+
+    // Función para ocultar indicador de reproducción
+    function stopAudioIndicator() {
+      lechuzaButton.classList.remove('playing');
+      isPlaying = false;
+    }
+
+    // Función principal para reproducir audio
+    function playAudio() {
+      audios.forEach(audio => {
+        if (audio) {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+      });
+
+      let playIndex = currentAudioIndex;
+      const currentAudio = audios[playIndex];
+
+      if (!currentAudio) {
+        console.error('Audio no encontrado en índice:', playIndex);
+        return;
+      }
+
+      startAudioIndicator();
+
+      currentAudio.play()
+        .then(() => {})
+        .catch(error => {
+          console.error('Error al reproducir audio:', error);
+          stopAudioIndicator();
+        });
+
+      currentAudioIndex = (currentAudioIndex + 1) % audios.length;
+    }
+
+    // Inicializar sistema de audio
+    function initializeAudio() {
+      audios = [
+        document.getElementById('audio1'),
+        document.getElementById('audio2'),
+        document.getElementById('audio3')
+      ];
+
+      audios.forEach((audio, index) => {
+        if (audio) {
+          audio.volume = 0.7;
+          audio.addEventListener('ended', () => {
+            stopAudioIndicator();
+          });
+          audio.addEventListener('error', (e) => {
+            stopAudioIndicator();
+          });
+        }
+      });
+    }
+
+    lechuzaButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      playAudio();
+    });
+
+    lechuzaButton.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        playAudio();
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeAudio();
+    });
+
+    // ===== RESTO DEL CÓDIGO (sin cambios) =====
+    
+    // Header scroll effect
+    window.addEventListener('scroll', function () {
+      const header = document.getElementById('header');
+      const scrollPosition = window.scrollY;
+      if (scrollPosition > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+      const headerImage = document.querySelector('.header-image');
+      const moveY = scrollPosition * 0.5;
+      headerImage.style.transform = `translateY(-${moveY}px)`;
+    });
+
+    // Menú hamburguesa
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('navMenu');
+
+    function toggleMenu() {
+      navMenu.classList.toggle('open');
+    }
+
+    hamburger.addEventListener('click', toggleMenu);
+    hamburger.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') toggleMenu();
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!navMenu.contains(e.target) && !hamburger.contains(e.target)) {
+        navMenu.classList.remove('open');
+      }
+    });
+
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function () {
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        this.classList.add('active');
+        navMenu.classList.remove('open');
+      });
+    });
+
+    // Scroll suave
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+  </script>
+
+   <script>
+ const btn = document.getElementById('button');
+
+document.getElementById('form')
+ .addEventListener('submit', function(event) {
+   event.preventDefault();
+
+   btn.value = 'Sending...';
+
+   const serviceID = 'default_service';
+   const templateID = 'template_ru4rt7o';
+
+   emailjs.sendForm(serviceID, templateID, this)
+    .then(() => {
+      btn.value = 'Send Email';
+      alert('Sent!');
+    }, (err) => {
+      btn.value = 'Send Email';
+      alert(JSON.stringify(err));
+    });
+});
+   </script>
+
+</body>
+</html>
+
